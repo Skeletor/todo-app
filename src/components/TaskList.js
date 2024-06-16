@@ -1,33 +1,44 @@
 
+import { Component } from 'react';
+
 import Task from './Task'
-import { formatDistanceToNow } from "date-fns";
+//import { formatDistanceToNow } from "date-fns";
 //creationDate={formatDistanceToNow(props.list[0].creationDate)}
 
 import './TaskList.css'
 
-const TaskList = (props) => {
+export default class TaskList extends Component {
 
-    return (
-        <div>
-            <ul className='todo-list'>
-                <li className='completed'>
-                    <Task description={props.list[0].description}
-                    creationDate={"created 17 seconds ago"} />
-                </li>
+    state = {
+        
+    }
+    
 
-                <li className='editing'>
-                    <Task description={props.list[1].description}
-                    creationDate={"created 5 minutes ago"} />
-                    <input type="text" class="edit" value="Editing task"></input>
-                </li>
 
-                <li>
-                    <Task description={props.list[2].description}
-                    creationDate={"created 5 minutes ago"} />
-                </li>
-            </ul>
-        </div>
-    );
+    render() {
+        const items = this.props.list.map((item) => {
+            
+            return (
+                //<li className={classNames}>
+                    <Task key={item.id}
+                        description={item.description} 
+                        completed={item.completed}
+                        editing={item.editing} 
+                        creationDate={item.creationDate}
+                        onDeleted={() => this.props.onDeleted(item.id)} />
+                    //<input type="text" className="edit" value="Editing task"></input>
+                //</li>
+            )
+        });
+
+        return (
+            <div>
+                <ul className='todo-list'>
+                    { items }
+                </ul>
+            </div>
+        );
+    }
+    
 }
 
-export default TaskList;

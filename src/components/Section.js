@@ -3,22 +3,11 @@ import TaskList from './TaskList';
 import Footer from './Footer';
 import './Section.css'
 
-const Section = () => {
-    const list = [
-        {
-            description: 'Completed task',
-        },
-        {
-            description: 'Editing task',
-        },
-        {
-            description: 'Active task'
-        }
-    ];
+const Section = (props) => {
 
     return (
         <div className='main'>
-            <TaskList list={list} />
+            <TaskList list={props.list} onDeleted={props.onDeleted} />
             <Footer />
         </div>
     );
