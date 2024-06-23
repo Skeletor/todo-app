@@ -8,24 +8,26 @@ import './index.css'
 
 export default class App extends Component {
 
+  id = 1;
+  
   state = {
     todos: [  
       { 
-        id: 1,
+        id: this.id++,
         description: 'Completed task',
         creationDate: 'created 5 sec ago',
         completed: true,
         editing: false,
       },
       {
-        id: 2,
+        id: this.id++,
         description: 'Editing task',
         creationDate: 'created 10 sec ago',
         completed: false,
         editing: true,
       },
       { 
-        id: 3,
+        id: this.id++,
         description: 'Active task',
         creationDate: 'created yday',
         completed: false,
@@ -47,12 +49,57 @@ export default class App extends Component {
       }
     })
   }
+
+  deleteCompleted = () => {
+
+    this.setState((state) => {
+      return {
+        todos: state.todos.filter((el) => !el.completed)
+      }
+    })
+  }
+
+  setCompleted = (id, completed) => {
+
+    this.setState((state) => {
+
+      const index = state.todos.findIndex((el) => el.id === id)
+      const task = { ...state.todos[index], completed };
+      const todos = state.todos.toSpliced(index, 1, task)
+
+      return {
+        todos: todos
+      }
+    })
+  }
+
+  addTask = (text) => {
+
+    this.setState((state) => {
+
+      const todos = state.todos
+      const task = {
+        id: this.id++,
+        description: text,
+        creationDate: 'created now',
+        completed: false,
+        editing: false
+      }
+
+      return {
+        todos: [...todos, task]
+      }
+    })
+  }
   
   render () {
     return (
     <div className='todoapp'>
-      <Header />
-      <Section list={this.state.todos} onDeleted={(id) => this.deleteTask(id)}/>
+      <Header onAddTask={(text) => this.addTask(text)} />
+      <Section list={this.state.todos}
+              onDeleted={(id) => this.deleteTask(id)} 
+              onDeleteCompleted={() => this.deleteCompleted()}
+              onComplete={(id, completed) => this.setCompleted(id, completed)} />
     </div>
     );
   

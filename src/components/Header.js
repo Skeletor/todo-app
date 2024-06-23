@@ -7,7 +7,7 @@ const Header = (props) => {
         <div>
             <header className='header'>
                 <h1>Todos</h1>
-                <NewTaskForm />
+                <NewTaskForm onAddTask={props.onAddTask}/>
             </header>
         </div>
     );
