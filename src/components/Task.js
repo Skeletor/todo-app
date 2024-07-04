@@ -1,6 +1,5 @@
-
 import { Component } from 'react'
-
+import { PropTypes } from 'prop-types'
 import './Task.css'
 
 export default class Task extends Component {
@@ -8,6 +7,43 @@ export default class Task extends Component {
     state = {
         completed: this.props.completed,
         editing: this.props.editing,
+        currentText: this.props.description
+    }
+
+    static defaultProps = {
+        completed: false,
+        editing: false,
+    }
+
+    static propTypes = {
+        completed: PropTypes.bool,
+        editing: PropTypes.bool,
+        currentText: PropTypes.string
+    }
+
+    onEditButtonClick = () => {
+        this.setState((state) => {
+            return {
+                editing: true
+            }
+        })
+    }
+
+    onInputChange = (e) => {
+        const value = e.target.value
+        this.setState({
+            currentText: value
+        })
+    }
+
+    onEditingFinished = () => {
+        this.setState((state) => {
+            return {
+                editing: false
+            }
+        })
+
+        this.props.onEdit(this.props.id, this.state.currentText);
     }
 
     onCheckBoxClick = () => {        
@@ -25,7 +61,7 @@ export default class Task extends Component {
 
         let classNames = []
         const { completed, editing } = this.state
-        
+
         if (completed)
             classNames.push('completed')
 
@@ -46,11 +82,18 @@ export default class Task extends Component {
                         <span className='description'>{ this.props.description }</span>
                         <span className='created'>{ this.props.creationDate }</span>
                     </label>
-                    <button className='icon icon-edit'></button>
+                    <button className='icon icon-edit' onClick={ this.onEditButtonClick }></button>
                     <button className='icon icon-destroy' onClick={ this.props.onDeleted }></button>
                 </div>
-                <input type="text" className="edit" value={ this.props.description }
-                        onChange={() => {}}></input>
+                <input type='text' className='edit' autoFocus
+                        value={ this.state.currentText }
+                        onChange={ this.onInputChange }
+                        onBlur={ this.onEditingFinished }
+                        onKeyDown={ (e) => {
+                            if (e.code === 'Enter') {
+                                this.onEditingFinished()
+                            }
+                        } }></input>
             </li>
         );
     }

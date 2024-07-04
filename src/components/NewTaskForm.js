@@ -29,13 +29,13 @@ export default class NewTaskForm extends Component {
 
     render() {
         return (
-            <form onSubmit={this.onSubmit}>
+            <form onSubmit={ this.onSubmit }>
                 <input className="new-todo" 
                         placeholder="What needs to be done?" 
                         autoFocus
                         type="text"
-                        onChange={this.onInputChange}
-                        value={this.state.text}></input>
+                        onChange={ this.onInputChange }
+                        value={ this.state.text }></input>
             </form>
         );
     }

@@ -55,16 +55,17 @@ export default class Section extends Component {
 
     render() {
         return (
-            <div className='main'>
-                <TaskList list={this.state.filteredTodos} 
-                        onDeleted={this.props.onDeleted} 
-                        onComplete={this.props.onComplete} />
+            <div className="main">
+                <TaskList list={ this.state.filteredTodos } 
+                        onDeleted={ this.props.onDeleted } 
+                        onComplete={ this.props.onComplete }
+                        onEdit={ this.props.onEdit } />
 
-                <Footer remainingTaskCount={this.props.list.reduce((prev, current) => {
+                <Footer remainingTaskCount={ this.props.list.reduce((prev, current) => {
                     return current.completed ? prev : prev + 1
-                }, 0)}
-                        changeFilter={(filter) => this.changeFilter(filter)} 
-                        onDeleteCompleted={this.props.onDeleteCompleted}/>
+                }, 0) }
+                        changeFilter={ (filter) => this.changeFilter(filter) } 
+                        onDeleteCompleted={ this.props.onDeleteCompleted }/>
             </div>
         );
     }
