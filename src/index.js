@@ -1,100 +1,82 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 
-import Header from './components/Header'
-import Section from './components/Section'
+import Header from './components/Header/Header'
+import Section from './components/Section/Section'
+
+import { copy } from './service/copy'
 
 import './index.css'
 
-export default class App extends Component {
+let id = 1
 
-  id = 1;
-  
-  state = {
-    todos: []
+const App = () => {
+  const [todos, setTodos] = useState([])
+
+  const deleteTask = (id) => modifyTask(id)
+
+  const editTask = (id, newText) => {
+    const index = todos.findIndex((todo) => todo.id === id)
+    const todo = copy(todos[index])
+    todo.description = newText
+    modifyTask(id, todo)
   }
 
-  deleteTask = (id) => {
-    this.setState((state) => {
+  const addTask = (text) => {
+    const newTask = {
+      id: id++,
+      description: text,
+      creationDate: new Date(),
+      editing: false,
+      completed: false
+    }
 
-      const todos = state.todos
-      const index = todos.findIndex((todo) => todo.id === id)
-      const newState = todos.toSpliced(index, 1)
-
-      return {
-        todos: newState
-      }
-    })
+    const newTodos = copy(todos)
+    newTodos.push(newTask)
+    setTodos(newTodos)
   }
 
-  editTask = (id, newText) => {
-    this.setState((state) => {
-      
-      const todos = state.todos
-      const index = todos.findIndex((todo) => todo.id === id)
-      const newTodo = { ...todos[index], description: newText }
-      const newState = todos.toSpliced(index, 1, newTodo)
-
-      return {
-        todos: newState
-      }
-    })
+  const deleteCompleted = () => {
+    const todosCopy = copy(todos)
+    const filtered = todosCopy.filter((todo) => !todo.completed)
+    setTodos(filtered)
   }
 
-  deleteCompleted = () => {
-    this.setState((state) => {
-      return {
-        todos: state.todos.filter((el) => !el.completed)
-      }
-    })
+  const setCompleted = (id, completed) => {
+    const todo = todos.find((todo) => todo.id === id)
+    if (!todo)
+      return
+
+    const todoCopy = copy(todo)
+    todoCopy.completed = completed
+    modifyTask(id, todoCopy)
   }
 
-  setCompleted = (id, completed) => {
+  const modifyTask = (id, newItem) => {
+    const newTodos = copy(todos)
+    const index = newTodos.findIndex((todo) => todo.id === id)
 
-    this.setState((state) => {
+    if (index === -1)
+      return
 
-      const index = state.todos.findIndex((el) => el.id === id)
-      const task = { ...state.todos[index], completed };
-      const todos = state.todos.toSpliced(index, 1, task)
-
-      return {
-        todos: todos
-      }
-    })
+    if (!newItem)
+      newTodos.splice(index, 1)
+    else
+      newTodos.splice(index, 1, newItem)
+    
+    setTodos(newTodos)
   }
 
-  addTask = (text) => {
-
-    this.setState((state) => {
-
-      const todos = state.todos
-      const task = {
-        id: this.id++,
-        description: text,
-        creationDate: new Date(),
-        completed: false,
-        editing: false
-      }
-
-      return {
-        todos: [...todos, task]
-      }
-    })
-  }
-  
-  render () {
-    return (
+  return (
     <div className='todoapp'>
-      <Header onAddTask={ (text) => this.addTask(text) } />
-      <Section list={ this.state.todos }
-              onDeleted={ (id) => this.deleteTask(id) } 
-              onDeleteCompleted={ () => this.deleteCompleted() }
-              onComplete={ (id, completed) => this.setCompleted(id, completed) } 
-              onEdit={ (id, newText) => this.editTask(id, newText) } />
+      <Header onAddTask={ addTask } />
+      <Section list={ todos }
+              onDeleted={ deleteTask } 
+              onDeleteCompleted={ deleteCompleted }
+              onComplete={ setCompleted } 
+              onEdit={ editTask } />
     </div>
-    );
-  
-  }
+  )
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
