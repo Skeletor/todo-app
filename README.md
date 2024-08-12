@@ -1,2 +1,2 @@
 Built app link:
-https://todoapp-alu1tch8e-ruslans-projects-6fb20abd.vercel.app/
+https://todoapp-f3fm1k3d2-ruslans-projects-6fb20abd.vercel.app
