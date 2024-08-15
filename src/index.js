@@ -1,10 +1,17 @@
-import React, { useState } from 'react'
-import ReactDOM from 'react-dom'
+import React, { useState } from 'react';
+import ReactDOM from 'react-dom/client';
 
-import Header from './components/Header/Header'
-import Section from './components/Section/Section'
+import Header from './components/Header/header'
+import Section from './components/Section/section'
 
-import { copy } from './service/copy'
+import TodoListContext from './context/todo-list-context';
+import ActiveTodoCountContext from './context/active-todo-count-context';
+import DeleteCompletedContext from './context/delete-completed-context';
+import EditTodoContext from './context/edit-todo-context';
+import SetCompletedContext from './context/set-completed-context';
+import DeleteTodoContext from './context/delete-todo-context';
+
+import { copy } from './service/copy';
 
 import './index.css'
 
@@ -13,33 +20,27 @@ let id = 1
 const App = () => {
   const [todos, setTodos] = useState([])
 
-  const deleteTask = (id) => modifyTask(id)
-
-  const editTask = (id, newText) => {
-    const index = todos.findIndex((todo) => todo.id === id)
-    const todo = copy(todos[index])
-    todo.description = newText
-    modifyTask(id, todo)
-  }
-
-  const addTask = (text) => {
-    const newTask = {
+  const addTodo = (text, minutes, seconds) => {
+    const todo = {
       id: id++,
-      description: text,
       creationDate: new Date(),
-      editing: false,
-      completed: false
+      text: text,
+      completed: false,
+      seconds: minutes * 60 + seconds,
     }
 
     const newTodos = copy(todos)
-    newTodos.push(newTask)
+    newTodos.push(todo)
     setTodos(newTodos)
   }
 
-  const deleteCompleted = () => {
-    const todosCopy = copy(todos)
-    const filtered = todosCopy.filter((todo) => !todo.completed)
-    setTodos(filtered)
+  const deleteTodo = (id) => modifyTodo(id)
+
+  const editTodo = (id, newText) => {
+    const index = todos.findIndex((todo) => todo.id === id)
+    const todo = copy(todos[index])
+    todo.text = newText
+    modifyTodo(id, todo)
   }
 
   const setCompleted = (id, completed) => {
@@ -49,10 +50,10 @@ const App = () => {
 
     const todoCopy = copy(todo)
     todoCopy.completed = completed
-    modifyTask(id, todoCopy)
+    modifyTodo(id, todoCopy)
   }
 
-  const modifyTask = (id, newItem) => {
+  const modifyTodo = (id, newItem) => {
     const newTodos = copy(todos)
     const index = newTodos.findIndex((todo) => todo.id === id)
 
@@ -61,22 +62,41 @@ const App = () => {
 
     if (!newItem)
       newTodos.splice(index, 1)
-    else
+    else 
       newTodos.splice(index, 1, newItem)
     
     setTodos(newTodos)
   }
 
+  const deleteCompleted = () => {
+    const todosCopy = copy(todos)
+    const filtered = todosCopy.filter((todo) => !todo.completed)
+    setTodos(filtered)
+  }
+
+  const countActiveTodos = () => todos.reduce((prev, current) => prev + Number(!current.completed), 0)
+
   return (
-    <div className='todoapp'>
-      <Header onAddTask={ addTask } />
-      <Section list={ todos }
-              onDeleted={ deleteTask } 
-              onDeleteCompleted={ deleteCompleted }
-              onComplete={ setCompleted } 
-              onEdit={ editTask } />
-    </div>
+    <TodoListContext.Provider value={ todos }>
+      <ActiveTodoCountContext.Provider value={ countActiveTodos() }>
+        <DeleteCompletedContext.Provider value={ deleteCompleted }>
+          <EditTodoContext.Provider value={ editTodo }>
+            <SetCompletedContext.Provider value={ setCompleted }>
+              <DeleteTodoContext.Provider value={ deleteTodo }>
+
+                <section className='todoapp'>
+                  <Header onAddTodo={ addTodo } />
+                  <Section />
+                </section>
+
+              </DeleteTodoContext.Provider>
+            </SetCompletedContext.Provider>
+          </EditTodoContext.Provider>
+        </DeleteCompletedContext.Provider>
+      </ActiveTodoCountContext.Provider>
+    </TodoListContext.Provider>
   )
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
